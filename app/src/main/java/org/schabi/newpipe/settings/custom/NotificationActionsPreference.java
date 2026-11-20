@@ -74,8 +74,29 @@ public class NotificationActionsPreference extends Preference
                                           final String key) {
         if (key != null && key.equals(getContext().getString(
                 R.string.media_session_hide_prev_next_key)) && boundView != null) {
+            final boolean hidePrevNext = sharedPreferences.getBoolean(key, true);
+            final SharedPreferences.Editor editor = sharedPreferences.edit();
+            if (hidePrevNext) {
+                resetSlotIfMatches(sharedPreferences, editor, 0,
+                        NotificationConstants.PREVIOUS, NotificationConstants.NOTHING);
+                resetSlotIfMatches(sharedPreferences, editor, 4,
+                        NotificationConstants.NEXT, NotificationConstants.NOTHING);
+                editor.apply();
+            }
+
             updateSummary(boundView);
             setupActions(boundView);
+        }
+    }
+
+    private void resetSlotIfMatches(@NonNull final SharedPreferences prefs,
+                                    @NonNull final SharedPreferences.Editor editor,
+                                    final int slot,
+                                    @NotificationConstants.Action final int from,
+                                    @NotificationConstants.Action final int to) {
+        final String slotKey = getContext().getString(NotificationConstants.SLOT_PREF_KEYS[slot]);
+        if (prefs.contains(slotKey) && prefs.getInt(slotKey, from) == from) {
+            editor.putInt(slotKey, to);
         }
     }
 

@@ -111,11 +111,12 @@ public final class NotificationConstants {
     /**
      * Returns the default action for a notification slot.
      *
-     * <p>When OS-level prev/next are hidden or on pre-Android 13, the slots default to
-     * [PREVIOUS, REWIND, PLAY_PAUSE_BUFFERING, FORWARD, NEXT], so rewind/forward sit next to
-     * play/pause. On Android 13+ when OS-level prev/next are NOT hidden, the system locks
-     * previous/next/play in the center and only allows customizing the two outer actions (slots 3
-     * and 4), which default to REWIND and FORWARD.</p>
+     * <p>When OS-level prev/next are hidden, the four custom slots default to
+     * [NOTHING, REWIND, PLAY_PAUSE_BUFFERING, FORWARD, NOTHING], leaving only rewind, play/pause
+     * and forward. On pre-Android 13, or when OS-level prev/next are not hidden, the slots default
+     * to [PREVIOUS, REWIND, PLAY_PAUSE_BUFFERING, FORWARD, NEXT]. On Android 13+ with OS-level
+     * prev/next visible, the system locks previous/next/play in the center and only allows
+     * customizing the two outer actions (slots 3 and 4), which default to REWIND and FORWARD.</p>
      *
      * @param context the application context
      * @param prefs the shared preferences
@@ -126,8 +127,22 @@ public final class NotificationConstants {
     public static int getDefaultAction(@NonNull final Context context,
                                        @NonNull final SharedPreferences prefs,
                                        final int slot) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                && !isHidePrevNext(context, prefs)) {
+        final boolean hidePrevNext = isHidePrevNext(context, prefs);
+        if (hidePrevNext) {
+            switch (slot) {
+                case 0:
+                case 4:
+                    return NOTHING;
+                case 1:
+                    return REWIND;
+                case 3:
+                    return FORWARD;
+                default:
+                    return SLOT_DEFAULTS[slot];
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (slot == 3) {
                 return REWIND;
             } else if (slot == 4) {
