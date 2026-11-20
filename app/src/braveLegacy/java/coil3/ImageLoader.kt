@@ -9,7 +9,6 @@ class ImageLoader private constructor() {
     fun getMemoryCache(): MemoryCache = MemoryCache()
     fun getDiskCache(): DiskCache = DiskCache()
 
-
     class Builder(context: Context) {
         fun logger(logger: Any?): Builder = this
 

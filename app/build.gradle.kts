@@ -23,7 +23,7 @@ val gitWorkingBranch = providers.exec {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -243,6 +243,7 @@ tasks.register<Checkstyle>("runCheckstyle") {
     exclude("**/BuildConfig.java")
     exclude("main/java/us/shandian/giga/**")
     exclude("braveLegacy/java/us/shandian/giga/**")
+    exclude("braveLegacy/java/coil3/**")
 
     classpath = configurations.getByName("checkstyle")
 
