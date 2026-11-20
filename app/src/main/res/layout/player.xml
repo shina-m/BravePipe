@@ -546,7 +546,7 @@
             android:weightSum="5.5">
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/playPreviousButton"
+                android:id="@+id/playerButtonLeftOuter"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="4dp"
@@ -560,7 +560,7 @@
                 app:tint="@color/white" />
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/fastRewindButton"
+                android:id="@+id/playerButtonLeftInner"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="4dp"
@@ -585,7 +585,7 @@
                 app:tint="@color/white" />
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/fastForwardButton"
+                android:id="@+id/playerButtonRightInner"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="4dp"
@@ -599,7 +599,7 @@
                 app:tint="@color/white" />
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/playNextButton"
+                android:id="@+id/playerButtonRightOuter"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="4dp"

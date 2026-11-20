@@ -28,8 +28,8 @@ public final class FlingBehavior extends AppBarLayout.Behavior {
     private final Rect globalRect = new Rect();
     private final List<Integer> skipInterceptionOfElements = List.of(
             R.id.itemsListPanel, R.id.playbackSeekBar,
-            R.id.playPauseButton, R.id.playPreviousButton, R.id.fastRewindButton,
-            R.id.fastForwardButton, R.id.playNextButton);
+            R.id.playPauseButton, R.id.playerButtonLeftOuter, R.id.playerButtonLeftInner,
+            R.id.playerButtonRightInner, R.id.playerButtonRightOuter);
 
     @Override
     public boolean onRequestChildRectangleOnScreen(

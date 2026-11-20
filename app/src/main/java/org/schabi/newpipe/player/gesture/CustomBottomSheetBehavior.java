@@ -29,8 +29,8 @@ public class CustomBottomSheetBehavior extends BottomSheetBehavior<FrameLayout> 
     private final List<Integer> skipInterceptionOfElements = List.of(
             R.id.detail_content_root_layout, R.id.relatedItemsLayout,
             R.id.itemsListPanel, R.id.view_pager, R.id.tab_layout, R.id.bottomControls,
-            R.id.playPauseButton, R.id.playPreviousButton, R.id.fastRewindButton,
-            R.id.fastForwardButton, R.id.playNextButton);
+            R.id.playPauseButton, R.id.playerButtonLeftOuter, R.id.playerButtonLeftInner,
+            R.id.playerButtonRightInner, R.id.playerButtonRightOuter);
 
     @Override
     public boolean onInterceptTouchEvent(@NonNull final CoordinatorLayout parent,

@@ -53,6 +53,30 @@
         <item>30000</item>
     </string-array>
 
+    <string name="player_button_left_outer_key">player_button_left_outer_key</string>
+    <string name="player_button_left_inner_key">player_button_left_inner_key</string>
+    <string name="player_button_right_inner_key">player_button_right_inner_key</string>
+    <string name="player_button_right_outer_key">player_button_right_outer_key</string>
+    <string name="player_button_action_nothing">nothing</string>
+    <string name="player_button_action_previous">previous</string>
+    <string name="player_button_action_rewind">rewind</string>
+    <string name="player_button_action_forward">forward</string>
+    <string name="player_button_action_next">next</string>
+    <string-array name="player_button_action_values">
+        <item>@string/player_button_action_previous</item>
+        <item>@string/player_button_action_rewind</item>
+        <item>@string/player_button_action_forward</item>
+        <item>@string/player_button_action_next</item>
+        <item>@string/player_button_action_nothing</item>
+    </string-array>
+    <string-array name="player_button_action_description">
+        <item>@string/previous_stream</item>
+        <item>@string/rewind</item>
+        <item>@string/forward</item>
+        <item>@string/next_stream</item>
+        <item>@string/notification_action_nothing</item>
+    </string-array>
+
     <string name="progressive_load_interval_key">progressive_load_interval</string>
     <string name="progressive_load_interval_default_value">64</string>
     <string name="progressive_load_interval_exoplayer_default_value">exoplayer_default</string>
