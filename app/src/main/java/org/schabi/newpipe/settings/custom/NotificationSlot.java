@@ -64,24 +64,71 @@ class NotificationSlot {
         this.i = actionIndex;
         this.onToggleCompactSlot = onToggleCompactSlot;
 
+        final boolean hidePrevNext = NotificationConstants.isHidePrevNext(context, prefs);
         selectedAction = Objects.requireNonNull(prefs).getInt(
                 context.getString(NotificationConstants.SLOT_PREF_KEYS[i]),
-                NotificationConstants.getDefaultAction(i));
+                NotificationConstants.getDefaultAction(context, prefs, i));
         final View view = parentView.findViewById(SLOT_ITEMS[i]);
 
-        // only show the last two notification slots on Android 13+
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || i >= 3) {
+        final boolean shouldShow;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            shouldShow = true;
+        } else if (hidePrevNext) {
+            shouldShow = (i != 2);
+        } else {
+            shouldShow = (i >= 3);
+        }
+
+        if (shouldShow) {
+            view.setVisibility(View.VISIBLE);
             setupSelectedAction(view);
-            setupTitle(view);
+            setupTitle(view, hidePrevNext);
             setupCheckbox(view, isCompactSlotChecked);
         } else {
             view.setVisibility(View.GONE);
         }
     }
 
-    void setupTitle(final View view) {
+    void setupTitle(final View view, final boolean hidePrevNext) {
+        final int titleRes;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (hidePrevNext) {
+                switch (i) {
+                    case 0:
+                        titleRes = R.string.notification_action_0_title_4slot;
+                        break;
+                    case 1:
+                        titleRes = R.string.notification_action_1_title_4slot;
+                        break;
+                    case 3:
+                        titleRes = R.string.notification_action_3_title_4slot;
+                        break;
+                    case 4:
+                        titleRes = R.string.notification_action_4_title_4slot;
+                        break;
+                    default:
+                        titleRes = SLOT_TITLES[i];
+                        break;
+                }
+            } else {
+                switch (i) {
+                    case 3:
+                        titleRes = R.string.notification_action_3_title_2slot;
+                        break;
+                    case 4:
+                        titleRes = R.string.notification_action_4_title_2slot;
+                        break;
+                    default:
+                        titleRes = SLOT_TITLES[i];
+                        break;
+                }
+            }
+        } else {
+            titleRes = SLOT_TITLES[i];
+        }
+
         ((TextView) view.findViewById(R.id.notificationActionTitle))
-                .setText(SLOT_TITLES[i]);
+                .setText(titleRes);
         view.findViewById(R.id.notificationActionClickableArea).setOnClickListener(
                 v -> openActionChooserDialog());
     }

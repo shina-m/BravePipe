@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class NotificationActionsPreference extends Preference {
+public class NotificationActionsPreference extends Preference
+        implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public NotificationActionsPreference(final Context context, final AttributeSet attrs) {
         super(context, attrs);
@@ -34,6 +35,7 @@ public class NotificationActionsPreference extends Preference {
 
     private NotificationSlot[] notificationSlots;
     private List<Integer> compactSlots;
+    private View boundView;
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -43,19 +45,47 @@ public class NotificationActionsPreference extends Preference {
     @Override
     public void onBindViewHolder(@NonNull final PreferenceViewHolder holder) {
         super.onBindViewHolder(holder);
+        boundView = holder.itemView;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ((TextView) holder.itemView.findViewById(R.id.summary))
-                    .setText(R.string.notification_actions_summary_android13);
-        }
+        updateSummary(holder.itemView);
 
         holder.itemView.setClickable(false);
         setupActions(holder.itemView);
+
+        final SharedPreferences prefs = getSharedPreferences();
+        if (prefs != null) {
+            prefs.registerOnSharedPreferenceChangeListener(this);
+        }
+    }
+
+    private void updateSummary(final View view) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            final boolean hidePrevNext = NotificationConstants.isHidePrevNext(
+                    getContext(), getSharedPreferences());
+            ((TextView) view.findViewById(R.id.summary))
+                    .setText(hidePrevNext
+                            ? R.string.notification_actions_summary_android13_4slot
+                            : R.string.notification_actions_summary_android13);
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
+                                          final String key) {
+        if (key != null && key.equals(getContext().getString(
+                R.string.media_session_hide_prev_next_key)) && boundView != null) {
+            updateSummary(boundView);
+            setupActions(boundView);
+        }
     }
 
     @Override
     public void onDetached() {
         super.onDetached();
+        final SharedPreferences prefs = getSharedPreferences();
+        if (prefs != null) {
+            prefs.unregisterOnSharedPreferenceChangeListener(this);
+        }
         saveChanges();
         // set package to this app's package to prevent the intent from being seen outside
         getContext().sendBroadcast(new Intent(ACTION_RECREATE_NOTIFICATION)

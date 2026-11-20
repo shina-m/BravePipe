@@ -93,28 +93,41 @@ public final class NotificationConstants {
     };
 
 
+    public static boolean isHidePrevNext(@NonNull final Context context,
+                                         @NonNull final SharedPreferences prefs) {
+        return prefs.getBoolean(
+                context.getString(R.string.media_session_hide_prev_next_key), false);
+    }
+
     @Action
     public static final int[] SLOT_DEFAULTS = {
             REWIND,
-            NOTHING,
+            PREVIOUS,
             PLAY_PAUSE_BUFFERING,
-            NOTHING,
+            NEXT,
             FORWARD,
     };
 
     /**
      * Returns the default action for a notification slot.
      *
-     * <p>The default layout shows only rewind, play/pause and forward (no previous/next). On
-     * Android 13+ the system only allows customizing two actions around play/pause, so those
-     * slots default to rewind and forward.</p>
+     * <p>When OS-level prev/next are hidden or on pre-Android 13, the slots default to
+     * [REWIND, PREVIOUS, PLAY_PAUSE_BUFFERING, NEXT, FORWARD], so rewind/forward are shown before
+     * previous/next. On Android 13+ when OS-level prev/next are NOT hidden, the system locks
+     * previous/next/play in the center and only allows customizing the two outer actions (slots 3
+     * and 4), which default to REWIND and FORWARD.</p>
      *
+     * @param context the application context
+     * @param prefs the shared preferences
      * @param slot the index of the notification slot (0-4)
      * @return the default action for the given slot
      */
     @Action
-    public static int getDefaultAction(final int slot) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    public static int getDefaultAction(@NonNull final Context context,
+                                       @NonNull final SharedPreferences prefs,
+                                       final int slot) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && !isHidePrevNext(context, prefs)) {
             if (slot == 3) {
                 return REWIND;
             } else if (slot == 4) {

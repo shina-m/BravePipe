@@ -1,5 +1,7 @@
 package org.schabi.newpipe.player.mediasession;
 
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_NEXT;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
 import static android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM;
 
 import android.net.Uri;
@@ -16,6 +18,7 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
 import com.google.android.exoplayer2.util.Util;
 
 import org.schabi.newpipe.player.Player;
+import org.schabi.newpipe.player.notification.NotificationConstants;
 import org.schabi.newpipe.player.playqueue.PlayQueue;
 import org.schabi.newpipe.player.playqueue.PlayQueueItem;
 import org.schabi.newpipe.util.image.ImageStrategy;
@@ -44,7 +47,10 @@ public class PlayQueueNavigator implements MediaSessionConnector.QueueNavigator 
     @Override
     public long getSupportedQueueNavigatorActions(
             @Nullable final com.google.android.exoplayer2.Player exoPlayer) {
-        return ACTION_SKIP_TO_QUEUE_ITEM;
+        if (NotificationConstants.isHidePrevNext(player.getContext(), player.getPrefs())) {
+            return ACTION_SKIP_TO_QUEUE_ITEM;
+        }
+        return ACTION_SKIP_TO_NEXT | ACTION_SKIP_TO_PREVIOUS | ACTION_SKIP_TO_QUEUE_ITEM;
     }
 
     @Override

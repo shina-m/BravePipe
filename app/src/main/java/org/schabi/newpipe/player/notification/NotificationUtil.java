@@ -237,7 +237,8 @@ public final class NotificationUtil {
         for (int i = 0; i < 5; ++i) {
             notificationSlots[i] = player.getPrefs().getInt(
                     player.getContext().getString(NotificationConstants.SLOT_PREF_KEYS[i]),
-                    NotificationConstants.getDefaultAction(i));
+                    NotificationConstants.getDefaultAction(
+                            player.getContext(), player.getPrefs(), i));
 
             if (notificationSlots[i] != NotificationConstants.NOTHING) {
                 if (settingsCompactSlots.contains(i)) {

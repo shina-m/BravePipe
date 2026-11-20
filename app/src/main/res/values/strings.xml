@@ -69,6 +69,15 @@
     <string name="notification_action_shuffle">Shuffle</string>
     <string name="notification_action_buffering">Buffering</string>
     <string name="notification_action_nothing">Nothing</string>
+    <string name="media_session_hide_prev_next_title">Hide prev/next in OS media controls</string>
+    <string name="media_session_hide_prev_next_summary">When enabled, the OS media controls (lock screen, quick settings) will show four fully customizable buttons instead of the system-fixed previous and next buttons. Configure all four slots below.</string>
+    <string name="notification_actions_summary_android13_4slot">All four action buttons around play/pause are customizable. The play/pause button in the center is fixed by the system.</string>
+    <string name="notification_action_0_title_4slot">First action button (far left)</string>
+    <string name="notification_action_1_title_4slot">Second action button (inner left)</string>
+    <string name="notification_action_3_title_4slot">Fourth action button (inner right)</string>
+    <string name="notification_action_4_title_4slot">Fifth action button (far right)</string>
+    <string name="notification_action_3_title_2slot">Left custom button</string>
+    <string name="notification_action_4_title_2slot">Right custom button</string>
     <string name="notification_colorize_title">Colorize notification</string>
     <string name="notification_colorize_summary">Have Android customize the notification\'s color according to the main color in the thumbnail (note that this is not available on all devices)</string>
     <string name="play_audio">Audio</string>
