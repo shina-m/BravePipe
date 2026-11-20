@@ -90,11 +90,6 @@
             android:name=".settings.SettingsActivity"
             android:exported="false"
             android:label="@string/settings" />
-        <activity
-            android:name=".about.AboutActivity"
-            android:exported="false"
-            android:label="@string/title_activity_about" />
-
         <service
             android:name=".local.feed.service.FeedLoadService"
             android:foregroundServiceType="dataSync" />
