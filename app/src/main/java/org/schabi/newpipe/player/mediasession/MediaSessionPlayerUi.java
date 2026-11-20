@@ -28,11 +28,11 @@ import org.schabi.newpipe.player.ui.PlayerUi;
 import org.schabi.newpipe.player.ui.VideoPlayerUi;
 import org.schabi.newpipe.util.StreamTypeUtil;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class MediaSessionPlayerUi extends PlayerUi
         implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -111,6 +111,12 @@ public class MediaSessionPlayerUi extends PlayerUi
                                           final String key) {
         if (key == null || key.equals(ignoreHardwareMediaButtonsKey)) {
             updateShouldIgnoreHardwareMediaButtons(sharedPreferences);
+        }
+        if (key == null || key.equals(player.getContext().getString(
+                R.string.media_session_hide_prev_next_key))) {
+            sessionConnector.invalidateMediaSessionPlaybackState();
+            prevNotificationActions = List.of();
+            updateMediaSessionActions();
         }
     }
 
@@ -198,14 +204,21 @@ public class MediaSessionPlayerUi extends PlayerUi
             return;
         }
 
-        // only use the fourth and fifth actions (the settings page also shows only the last 2 on
-        // Android 13+)
-        final List<NotificationActionData> newNotificationActions = IntStream.of(3, 4)
-                .map(i -> player.getPrefs().getInt(
-                        player.getContext().getString(NotificationConstants.SLOT_PREF_KEYS[i]),
-                        NotificationConstants.SLOT_DEFAULTS[i]))
-                .mapToObj(action -> NotificationActionData
-                        .fromNotificationActionEnum(player, action))
+        // If hide prev/next is enabled, we provide 4 customizable actions (slots 0, 1, 3, 4)
+        // flanking the fixed center play/pause button. Otherwise, the OS manages prev/next and
+        // allows customizing 2 outer actions (slots 3 and 4).
+        final boolean hidePrevNext = NotificationConstants.isHidePrevNext(
+                player.getContext(), player.getPrefs());
+        final int[] slotsToUse = hidePrevNext ? new int[]{0, 1, 3, 4} : new int[]{3, 4};
+
+        final List<NotificationActionData> newNotificationActions = Arrays.stream(slotsToUse)
+                .mapToObj(i -> {
+                    final int action = player.getPrefs().getInt(
+                            player.getContext().getString(NotificationConstants.SLOT_PREF_KEYS[i]),
+                            NotificationConstants.getDefaultAction(
+                                    player.getContext(), player.getPrefs(), i));
+                    return NotificationActionData.fromNotificationActionEnum(player, action);
+                })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
@@ -272,6 +285,8 @@ public class MediaSessionPlayerUi extends PlayerUi
         super.onBroadcastReceived(intent);
         if (ACTION_RECREATE_NOTIFICATION.equals(intent.getAction())) {
             // the notification actions changed
+            sessionConnector.invalidateMediaSessionPlaybackState();
+            prevNotificationActions = List.of();
             updateMediaSessionActions();
         }
     }

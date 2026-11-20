@@ -119,7 +119,7 @@ jobs:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
           arch: ${{ matrix.arch }}
-          script: ./gradlew connectedCheck --stacktrace
+          script: ./gradlew connectedBraveDebugAndroidTest --stacktrace
 
       - name: Upload test report when tests fail # because the printed out stacktrace (console) is too short, see also #7553
         uses: actions/upload-artifact@v6

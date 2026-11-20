@@ -1,0 +1,81 @@
+name: Build fork APK
+
+on:
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fork-apk-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'build-apk'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Decode signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.BRAVEPIPE_KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/bravepipe-fork.keystore"
+          cat > keystore.properties <<EOF
+          storeFile=$RUNNER_TEMP/bravepipe-fork.keystore
+          storePassword=${{ secrets.BRAVEPIPE_KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.BRAVEPIPE_KEY_ALIAS }}
+          keyPassword=${{ secrets.BRAVEPIPE_KEY_PASSWORD }}
+          EOF
+
+      - name: Build signed release APK
+        run: |
+          VERSION_CODE=$((581014 + ${{ github.run_number }}))
+          VERSION_SUFFIX=-shina-${{ github.run_number }}
+          ./gradlew :app:assembleBraveRelease \
+            -DskipFormatKtlint \
+            -DapplicationIdOverride=com.github.shinam.bravenewpipe \
+            -DversionCodeOverride="$VERSION_CODE" \
+            -DversionNameSuffix="$VERSION_SUFFIX" \
+            --no-daemon --max-workers=2 \
+            "-Dorg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=768m"
+
+      - name: Verify and rename APK
+        run: |
+          APK=$(find app/build/outputs/apk/brave/release -name '*.apk' | head -1)
+          test -n "$APK"
+          APKSIGNER=$(find "${ANDROID_HOME:-$ANDROID_SDK_ROOT}/build-tools" -name apksigner | sort -V | tail -1)
+          "$APKSIGNER" verify --print-certs "$APK"
+          mkdir -p dist
+          cp "$APK" "dist/BravePipe_shina_${{ github.run_number }}.apk"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v6
+        with:
+          name: BravePipe-shina-${{ github.run_number }}
+          path: dist/*.apk
+          if-no-files-found: error
+
+      - name: Job summary
+        run: |
+          echo "### BravePipe fork APK" >> "$GITHUB_STEP_SUMMARY"
+          echo "Built \`BravePipe_shina_${{ github.run_number }}.apk\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Application ID: \`com.github.shinam.bravenewpipe\`" >> "$GITHUB_STEP_SUMMARY"

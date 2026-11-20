@@ -546,10 +546,10 @@
             android:weightSum="5.5">
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/playPreviousButton"
+                android:id="@+id/playerButtonLeftOuter"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="4dp"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
@@ -559,6 +559,19 @@
                 android:src="@drawable/ic_previous"
                 app:tint="@color/white" />
 
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/playerButtonLeftInner"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="@string/rewind"
+                android:focusable="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/exo_controls_rewind"
+                app:tint="@color/white" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/playPauseButton"
@@ -572,10 +585,24 @@
                 app:tint="@color/white" />
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/playNextButton"
+                android:id="@+id/playerButtonRightInner"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="@string/forward"
+                android:focusable="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/exo_controls_fastforward"
+                app:tint="@color/white" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/playerButtonRightOuter"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="4dp"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
