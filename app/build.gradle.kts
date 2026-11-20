@@ -4,6 +4,8 @@
  */
 
 import com.android.build.api.dsl.ApplicationExtension
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     id("brave.pipe.plugin")
@@ -20,6 +22,13 @@ plugins {
 val gitWorkingBranch = providers.exec {
     commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
 }.standardOutput.asText.map { it.trim() }
+
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        FileInputStream(keystorePropertiesFile).use { load(it) }
+    }
+}
 
 java {
     toolchain {
@@ -52,6 +61,17 @@ configure<ApplicationExtension> {
         System.getProperty("versionNameSuffix")?.let { versionNameSuffix = it }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        if (keystorePropertiesFile.exists()) {
+            create("release") {
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
     }
 
     buildTypes {
@@ -87,8 +107,12 @@ configure<ApplicationExtension> {
                 applicationIdSuffix = suffix
                 resValue("string", "app_name", "NewPipe $suffix")
             }
-            isMinifyEnabled = true
-            isShrinkResources = true
+            if (keystorePropertiesFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+            val disableMinify = System.getProperty("disableMinify") != null
+            isMinifyEnabled = !disableMinify
+            isShrinkResources = !disableMinify
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -120,7 +144,8 @@ configure<ApplicationExtension> {
 
         create("brave") {
             dimension = "default"
-            applicationId = "com.github.bravenewpipe"
+            applicationId = System.getProperty("applicationIdOverride")
+                ?: "com.github.bravenewpipe"
             resValue("string", "app_name", "BravePipe")
             versionCode = defaultConfig.versionCode!! + braveVersionCode
             versionName = "${defaultConfig.versionName}-$braveVersionName"
