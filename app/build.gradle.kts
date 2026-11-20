@@ -116,10 +116,7 @@ configure<ApplicationExtension> {
         create("sponsorblock") { // only for strings of sponsorblock stuff
             dimension = "default"
             android.sourceSets.getByName("sponsorblock") {
-                res.srcDirs(listOf(
-                    "src/sponsorblock/res",
-                    android.sourceSets.getByName("sponsorblock").res.srcDirs
-                ))
+                res.srcDirs("src/sponsorblock/res")
             }
         }
 
@@ -131,10 +128,7 @@ configure<ApplicationExtension> {
             versionName = "${defaultConfig.versionName}-$braveVersionName"
 
             android.sourceSets.getByName("brave") {
-                res.srcDirs(listOf(
-                    "src/brave/res",
-                    android.sourceSets.getByName("sponsorblock").res.srcDirs
-                ))
+                res.srcDirs("src/brave/res", "src/sponsorblock/res")
             }
         }
 
@@ -146,9 +140,7 @@ configure<ApplicationExtension> {
             versionName = "${defaultConfig.versionName}-$braveVersionName"
 
             android.sourceSets.getByName("braveConscrypt") {
-                res.srcDirs(listOf(
-                    android.sourceSets.getByName("brave").res.srcDirs
-                ))
+                res.srcDirs("src/brave/res", "src/sponsorblock/res")
             }
 
             //noinspection WrongGradleMethod
@@ -165,10 +157,7 @@ configure<ApplicationExtension> {
             versionName = "${defaultConfig.versionName}-$braveVersionName"
 
             android.sourceSets.getByName("braveLegacy") {
-                res.srcDirs(listOf(
-                    "src/braveLegacy/res",
-                    android.sourceSets.getByName("braveConscrypt").res.srcDirs
-                ))
+                res.srcDirs("src/braveLegacy/res", "src/brave/res", "src/sponsorblock/res")
             }
 
             multiDexEnabled = true

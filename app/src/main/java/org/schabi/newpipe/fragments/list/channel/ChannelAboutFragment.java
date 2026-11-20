@@ -40,13 +40,13 @@ public class ChannelAboutFragment extends BaseDescriptionFragment {
         binding.constraintLayout.setPadding(0, DeviceUtils.dpToPx(8, requireContext()), 0, 0);
     }
 
-    @NonNull
+    @Nullable
     @Override
     protected Description getDescription() {
-        return Description.of(channelInfo.getDescription(), Description.Type.PLAIN_TEXT);
+        return new Description(channelInfo.getDescription(), Description.PLAIN_TEXT);
     }
 
-    @NonNull
+    @Nullable
     @Override
     protected StreamingService getService() {
         return channelInfo.getService();
@@ -63,7 +63,7 @@ public class ChannelAboutFragment extends BaseDescriptionFragment {
         return null;
     }
 
-    @NonNull
+    @Nullable
     @Override
     public List<String> getTags() {
         return channelInfo.getTags();
