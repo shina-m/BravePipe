@@ -18,6 +18,7 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
 import com.google.android.exoplayer2.util.Util;
 
 import org.schabi.newpipe.player.Player;
+import org.schabi.newpipe.player.helper.PlayerHelper;
 import org.schabi.newpipe.player.notification.NotificationConstants;
 import org.schabi.newpipe.player.playqueue.PlayQueue;
 import org.schabi.newpipe.player.playqueue.PlayQueueItem;
@@ -77,7 +78,11 @@ public class PlayQueueNavigator implements MediaSessionConnector.QueueNavigator 
 
     @Override
     public void onSkipToPrevious(@NonNull final com.google.android.exoplayer2.Player exoPlayer) {
-        player.playPrevious();
+        if (PlayerHelper.isNotificationPrevNextAsSeek(player.getContext(), player.getPrefs())) {
+            player.fastRewind();
+        } else {
+            player.playPrevious();
+        }
     }
 
     @Override
@@ -90,7 +95,11 @@ public class PlayQueueNavigator implements MediaSessionConnector.QueueNavigator 
 
     @Override
     public void onSkipToNext(@NonNull final com.google.android.exoplayer2.Player exoPlayer) {
-        player.playNext();
+        if (PlayerHelper.isNotificationPrevNextAsSeek(player.getContext(), player.getPrefs())) {
+            player.fastForward();
+        } else {
+            player.playNext();
+        }
     }
 
     private void publishFloatingQueueWindow() {

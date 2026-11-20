@@ -464,6 +464,17 @@ public final class PlayerHelper {
                 player.getContext().getString(R.string.seek_duration_default_value))));
     }
 
+    public static boolean isNotificationPrevNextAsSeek(@NonNull final Context context,
+                                                        @NonNull final SharedPreferences prefs) {
+        return prefs.getBoolean(context.getString(R.string.notification_prev_next_as_seek_key),
+                false);
+    }
+
+    public static boolean isPlayerPrevNextAsSeek(@NonNull final Context context,
+                                                 @NonNull final SharedPreferences prefs) {
+        return prefs.getBoolean(context.getString(R.string.player_prev_next_as_seek_key), false);
+    }
+
     // endregion
     // region Format
 

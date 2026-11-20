@@ -162,6 +162,7 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
     private String leftInnerAction = PLAYER_BUTTON_ACTION_REWIND;
     private String rightInnerAction = PLAYER_BUTTON_ACTION_FORWARD;
     private String rightOuterAction = PLAYER_BUTTON_ACTION_NEXT;
+    private boolean playerPrevNextAsSeek;
     @Nullable
     private SharedPreferences.OnSharedPreferenceChangeListener playerButtonsListener;
 
@@ -355,10 +356,12 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
                 key.equals(context.getString(R.string.player_button_left_outer_key))
                         || key.equals(context.getString(R.string.player_button_left_inner_key))
                         || key.equals(context.getString(R.string.player_button_right_inner_key))
-                        || key.equals(context.getString(R.string.player_button_right_outer_key)));
+                        || key.equals(context.getString(R.string.player_button_right_outer_key))
+                        || key.equals(context.getString(R.string.player_prev_next_as_seek_key)));
     }
 
     private void setupPlayerButtonActions() {
+        playerPrevNextAsSeek = PlayerHelper.isPlayerPrevNextAsSeek(context, player.getPrefs());
         leftOuterAction = getPlayerButtonAction(R.string.player_button_left_outer_key,
                 PLAYER_BUTTON_ACTION_PREVIOUS);
         leftInnerAction = getPlayerButtonAction(R.string.player_button_left_inner_key,
@@ -389,7 +392,11 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
             case PLAYER_BUTTON_ACTION_PREVIOUS:
                 button.setImageResource(R.drawable.ic_previous);
                 button.setContentDescription(context.getString(R.string.previous_stream));
-                button.setOnClickListener(makeOnClickListener(player::playPrevious));
+                if (playerPrevNextAsSeek) {
+                    button.setOnClickListener(makeOnClickListener(player::fastRewind));
+                } else {
+                    button.setOnClickListener(makeOnClickListener(player::playPrevious));
+                }
                 break;
 
             case PLAYER_BUTTON_ACTION_REWIND:
@@ -409,7 +416,11 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
             case PLAYER_BUTTON_ACTION_NEXT:
                 button.setImageResource(R.drawable.ic_next);
                 button.setContentDescription(context.getString(R.string.next_stream));
-                button.setOnClickListener(makeOnClickListener(player::playNext));
+                if (playerPrevNextAsSeek) {
+                    button.setOnClickListener(makeOnClickListener(player::fastForward));
+                } else {
+                    button.setOnClickListener(makeOnClickListener(player::playNext));
+                }
                 break;
 
             case PLAYER_BUTTON_ACTION_NOTHING:
@@ -874,9 +885,9 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
         if (PLAYER_BUTTON_ACTION_NOTHING.equals(action)) {
             visible = false;
         } else if (PLAYER_BUTTON_ACTION_PREVIOUS.equals(action)) {
-            visible = showPrev;
+            visible = playerPrevNextAsSeek || showPrev;
         } else if (PLAYER_BUTTON_ACTION_NEXT.equals(action)) {
-            visible = showNext;
+            visible = playerPrevNextAsSeek || showNext;
         } else {
             visible = true;
         }

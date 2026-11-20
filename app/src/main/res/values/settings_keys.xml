@@ -198,6 +198,8 @@
 
     <string name="notification_colorize_key">notification_colorize_key</string>
     <string name="media_session_hide_prev_next_key">media_session_hide_prev_next_key</string>
+    <string name="notification_prev_next_as_seek_key">notification_prev_next_as_seek_key</string>
+    <string name="player_prev_next_as_seek_key">player_prev_next_as_seek_key</string>
 
     <string name="video_mp4_key">video_mp4</string>
     <string name="video_webm_key">video_webm</string>
