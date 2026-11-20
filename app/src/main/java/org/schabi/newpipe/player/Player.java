@@ -834,10 +834,18 @@ public final class Player implements PlaybackListener, Listener {
                 playPause();
                 break;
             case ACTION_PLAY_PREVIOUS:
-                playPrevious();
+                if (PlayerHelper.isNotificationPrevNextAsSeek(context, getPrefs())) {
+                    fastRewind();
+                } else {
+                    playPrevious();
+                }
                 break;
             case ACTION_PLAY_NEXT:
-                playNext();
+                if (PlayerHelper.isNotificationPrevNextAsSeek(context, getPrefs())) {
+                    fastForward();
+                } else {
+                    playNext();
+                }
                 break;
             case ACTION_FAST_REWIND:
                 fastRewind();
