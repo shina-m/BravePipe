@@ -27,7 +27,8 @@ public final class ChannelTabHelper {
                 || tab.equals(ChannelTabs.LIKES)
                 || tab.equals(ChannelTabs.PODCASTS)
                 || tab.equals(ChannelTabs.SHORTS)
-                || tab.equals(ChannelTabs.LIVESTREAMS);
+                || tab.equals(ChannelTabs.LIVESTREAMS)
+                || tab.equals(ChannelTabs.COURSES);
     }
 
     /**
@@ -63,6 +64,8 @@ public final class ChannelTabHelper {
             return R.string.show_channel_tabs_likes;
         } else if (tab.equals(ChannelTabs.PODCASTS)) {
             return R.string.show_channel_tabs_podcasts;
+        } else if (tab.equals(ChannelTabs.COURSES)) {
+            return R.string.show_channel_tabs_courses;
         }
         return -1;
     }
@@ -81,6 +84,8 @@ public final class ChannelTabHelper {
             return R.string.fetch_channel_tabs_likes;
         } else if (tab.equals(ChannelTabs.PODCASTS)) {
             return R.string.fetch_channel_tabs_podcasts;
+        } else if (tab.equals(ChannelTabs.COURSES)) {
+            return R.string.fetch_channel_tabs_courses;
         }
         return -1;
     }
@@ -105,6 +110,8 @@ public final class ChannelTabHelper {
             return R.string.channel_tab_likes;
         } else if (tab.equals(ChannelTabs.PODCASTS)) {
             return R.string.channel_tab_podcasts;
+        } else if (tab.equals(ChannelTabs.COURSES)) {
+            return R.string.channel_tab_courses;
         }
         return R.string.unknown_content;
     }

@@ -378,7 +378,9 @@ public class MissionAdapter extends BraveMissionAdapter implements Handler.Callb
         viewIntent.addFlags(FLAG_GRANT_PREFIX_URI_PERMISSION);
 
         Intent chooserIntent = createChooser(viewIntent, null);
-        chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | FLAG_GRANT_READ_URI_PERMISSION);
+        chooserIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+        chooserIntent.addFlags(FLAG_GRANT_READ_URI_PERMISSION);
+        chooserIntent.addFlags(FLAG_GRANT_PREFIX_URI_PERMISSION);
 
         ShareUtils.openIntentInApp(mContext, chooserIntent);
     }
