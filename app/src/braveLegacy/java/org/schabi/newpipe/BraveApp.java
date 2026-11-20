@@ -45,7 +45,7 @@ public class BraveApp extends MultiDexApplication
      * <p>
      * In the {@link App} from main source set there is the static method {@link App#getInstance()}
      * from which many parts of the application get ApplicationContext. But as the class
-     * {@link App} inherits from BraveApp and sets the app variable in {@link @App#onCreate()}
+     * {@link App} inherits from BraveApp and sets the app variable in {@link App#onCreate()}
      * only after the {@link BraveApp#onCreate()} is called. Therefore {@link App#getInstance()}
      * has not yet an initialized return valule thus we need another way to get the
      * ApplicationContext

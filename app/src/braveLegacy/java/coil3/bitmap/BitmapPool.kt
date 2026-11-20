@@ -53,7 +53,6 @@ interface BitmapPool {
                 override fun clear() {
                     TODO("if the app crashes report this")
                 }
-
             }
         }
     }

@@ -10,4 +10,8 @@
 
   <suppress checks="FileLength"
     files="VideoDetailFragment.java"/>
+  <!-- BravePipe: the braveLegacy coil3 sources are compatibility shims which mirror the coil3
+       package names and generated-style class names, so they cannot follow NewPipe's style rules -->
+  <suppress checks=".*"
+    files=".*[\\/]braveLegacy[\\/]java[\\/]coil3[\\/].*"/>
 </suppressions>
