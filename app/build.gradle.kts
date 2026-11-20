@@ -58,6 +58,11 @@ configure<ApplicationExtension> {
         debug {
             isDebuggable = true
 
+            // Optional: build with the same application ID as the release app so the APK can
+            // update an existing installation in place (and keep its settings). The signing key
+            // still has to match the installed app.
+            val samePackageAsBase = System.getProperty("samePackageAsBase") != null
+
             // suffix the app id and the app name with git branch name
             val defaultBranches = listOf("master", "dev")
             val workingBranch = gitWorkingBranch.getOrElse("")
@@ -65,7 +70,9 @@ configure<ApplicationExtension> {
                 .replaceFirst("^[^A-Za-z]+".toRegex(), "")
                 .replace("[^0-9A-Za-z]+".toRegex(), "")
 
-            if (normalizedWorkingBranch.isEmpty() || workingBranch in defaultBranches) {
+            if (samePackageAsBase) {
+                // Keep the flavor's application ID and app name.
+            } else if (normalizedWorkingBranch.isEmpty() || workingBranch in defaultBranches) {
                 // default values when branch name could not be determined or is master or dev
                 applicationIdSuffix = ".debug"
                 resValue("string", "app_name", "BravePipe Debug")
