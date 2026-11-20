@@ -146,10 +146,10 @@ configure<ApplicationExtension> {
         // the amount of trailing zeros depends on the amount of digits the
         // defaultConfig.versionCode has -> we just prepend our increasing
         // versionCode before those zeros.
-        val braveVersionCode = 580000
+        val braveVersionCode = 590000
         // -> our versionName will be added as suffix to defaultConfig.versionName
         // We use major.minor.patch
-        val braveVersionName = "2.8.2"
+        val braveVersionName = "2.9.0"
 
         create("sponsorblock") { // only for strings of sponsorblock stuff
             dimension = "default"
