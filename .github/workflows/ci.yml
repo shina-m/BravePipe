@@ -57,6 +57,9 @@ jobs:
       - name: Rename strings from NewPipe to BravePipe
         run: ./gradlew bravify
 
+      - name: Format Kotlin after bravify
+        run: ./gradlew formatKtlint
+
       - name: Build brave flavor
         run: ./gradlew assembleBraveDebug
 
