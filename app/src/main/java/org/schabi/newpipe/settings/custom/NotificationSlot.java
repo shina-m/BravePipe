@@ -66,7 +66,7 @@ class NotificationSlot {
 
         selectedAction = Objects.requireNonNull(prefs).getInt(
                 context.getString(NotificationConstants.SLOT_PREF_KEYS[i]),
-                NotificationConstants.SLOT_DEFAULTS[i]);
+                NotificationConstants.getDefaultAction(i));
         final View view = parentView.findViewById(SLOT_ITEMS[i]);
 
         // only show the last two notification slots on Android 13+

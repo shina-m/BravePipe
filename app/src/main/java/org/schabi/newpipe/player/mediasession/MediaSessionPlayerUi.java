@@ -203,7 +203,7 @@ public class MediaSessionPlayerUi extends PlayerUi
         final List<NotificationActionData> newNotificationActions = IntStream.of(3, 4)
                 .map(i -> player.getPrefs().getInt(
                         player.getContext().getString(NotificationConstants.SLOT_PREF_KEYS[i]),
-                        NotificationConstants.SLOT_DEFAULTS[i]))
+                        NotificationConstants.getDefaultAction(i)))
                 .mapToObj(action -> NotificationActionData
                         .fromNotificationActionEnum(player, action))
                 .filter(Objects::nonNull)

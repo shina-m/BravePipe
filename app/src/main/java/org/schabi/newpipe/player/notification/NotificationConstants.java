@@ -2,6 +2,7 @@ package org.schabi.newpipe.player.notification;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.IntDef;
@@ -94,12 +95,34 @@ public final class NotificationConstants {
 
     @Action
     public static final int[] SLOT_DEFAULTS = {
-            SMART_REWIND_PREVIOUS,
+            REWIND,
+            PREVIOUS,
             PLAY_PAUSE_BUFFERING,
-            SMART_FORWARD_NEXT,
-            REPEAT,
-            CLOSE,
+            NEXT,
+            FORWARD,
     };
+
+    /**
+     * Returns the default action for a notification slot.
+     *
+     * <p>The default layout puts rewind and forward before previous and next. On Android 13+ the
+     * system always shows previous, play/pause and next together, and only allows customizing the
+     * two actions displayed around them, so those slots default to rewind and forward.</p>
+     *
+     * @param slot the index of the notification slot (0-4)
+     * @return the default action for the given slot
+     */
+    @Action
+    public static int getDefaultAction(final int slot) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (slot == 3) {
+                return REWIND;
+            } else if (slot == 4) {
+                return FORWARD;
+            }
+        }
+        return SLOT_DEFAULTS[slot];
+    }
 
     public static final int[] SLOT_PREF_KEYS = {
             R.string.notification_slot_0_key,
@@ -110,7 +133,7 @@ public final class NotificationConstants {
     };
 
 
-    public static final List<Integer> SLOT_COMPACT_DEFAULTS = List.of(0, 1, 2);
+    public static final List<Integer> SLOT_COMPACT_DEFAULTS = List.of(0, 2, 4);
 
     public static final int[] SLOT_COMPACT_PREF_KEYS = {
             R.string.notification_slot_compact_0_key,
