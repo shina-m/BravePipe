@@ -130,6 +130,59 @@
 
     <PreferenceCategory
         android:layout="@layout/settings_category_header_layout"
+        android:title="@string/settings_category_player_buttons_title"
+        app:singleLineTitle="false"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            android:selectable="false"
+            android:summary="@string/player_buttons_summary"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:defaultValue="@string/player_button_action_previous"
+            android:entries="@array/player_button_action_description"
+            android:entryValues="@array/player_button_action_values"
+            android:key="@string/player_button_left_outer_key"
+            android:title="@string/player_button_left_outer_title"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:defaultValue="@string/player_button_action_rewind"
+            android:entries="@array/player_button_action_description"
+            android:entryValues="@array/player_button_action_values"
+            android:key="@string/player_button_left_inner_key"
+            android:title="@string/player_button_left_inner_title"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:defaultValue="@string/player_button_action_forward"
+            android:entries="@array/player_button_action_description"
+            android:entryValues="@array/player_button_action_values"
+            android:key="@string/player_button_right_inner_key"
+            android:title="@string/player_button_right_inner_title"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:defaultValue="@string/player_button_action_next"
+            android:entries="@array/player_button_action_description"
+            android:entryValues="@array/player_button_action_values"
+            android:key="@string/player_button_right_outer_key"
+            android:title="@string/player_button_right_outer_title"
+            app:iconSpaceReserved="false"
+            app:singleLineTitle="false"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:layout="@layout/settings_category_header_layout"
         android:title="@string/settings_category_player_behavior_title"
         app:singleLineTitle="false"
         app:iconSpaceReserved="false">

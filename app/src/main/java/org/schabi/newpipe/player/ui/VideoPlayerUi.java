@@ -18,6 +18,7 @@ import static org.schabi.newpipe.player.helper.PlayerHelper.retrieveSeekDuration
 import static org.schabi.newpipe.util.SponsorBlockUtils.markSegments;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -42,6 +43,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.widget.AppCompatImageButton;
@@ -113,6 +115,12 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
     // other constants (TODO remove playback speeds and use normal menu for popup, too)
     private static final float[] PLAYBACK_SPEEDS = {0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f};
 
+    private static final String PLAYER_BUTTON_ACTION_NOTHING = "nothing";
+    private static final String PLAYER_BUTTON_ACTION_PREVIOUS = "previous";
+    private static final String PLAYER_BUTTON_ACTION_REWIND = "rewind";
+    private static final String PLAYER_BUTTON_ACTION_FORWARD = "forward";
+    private static final String PLAYER_BUTTON_ACTION_NEXT = "next";
+
     private enum PlayButtonAction {
         PLAY, PAUSE, REPLAY
     }
@@ -152,6 +160,13 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
     private BasePlayerGestureListener playerGestureListener;
     @Nullable
     private View.OnLayoutChangeListener onLayoutChangeListener = null;
+
+    private String leftOuterAction = PLAYER_BUTTON_ACTION_PREVIOUS;
+    private String leftInnerAction = PLAYER_BUTTON_ACTION_REWIND;
+    private String rightInnerAction = PLAYER_BUTTON_ACTION_FORWARD;
+    private String rightOuterAction = PLAYER_BUTTON_ACTION_NEXT;
+    @Nullable
+    private SharedPreferences.OnSharedPreferenceChangeListener playerButtonsListener;
 
     @NonNull
     private final SeekbarPreviewThumbnailHolder seekbarPreviewThumbnailHolder =
@@ -231,8 +246,14 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
         binding.shuffleButton.setOnClickListener(v -> onShuffleClicked());
 
         binding.playPauseButton.setOnClickListener(makeOnClickListener(player::playPause));
-        binding.playPreviousButton.setOnClickListener(makeOnClickListener(player::playPrevious));
-        binding.playNextButton.setOnClickListener(makeOnClickListener(player::playNext));
+        setupPlayerButtonActions();
+
+        playerButtonsListener = (sharedPreferences, key) -> {
+            if (isPlayerButtonPreference(key)) {
+                setupPlayerButtonActions();
+            }
+        };
+        player.getPrefs().registerOnSharedPreferenceChangeListener(playerButtonsListener);
 
         binding.moreOptionsButton.setOnClickListener(
                 makeOnClickListener(this::onMoreOptionsClicked));
@@ -312,8 +333,15 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
         binding.shuffleButton.setOnClickListener(null);
 
         binding.playPauseButton.setOnClickListener(null);
-        binding.playPreviousButton.setOnClickListener(null);
-        binding.playNextButton.setOnClickListener(null);
+        binding.playerButtonLeftOuter.setOnClickListener(null);
+        binding.playerButtonLeftInner.setOnClickListener(null);
+        binding.playerButtonRightInner.setOnClickListener(null);
+        binding.playerButtonRightOuter.setOnClickListener(null);
+
+        if (playerButtonsListener != null) {
+            player.getPrefs().unregisterOnSharedPreferenceChangeListener(playerButtonsListener);
+            playerButtonsListener = null;
+        }
 
         binding.moreOptionsButton.setOnClickListener(null);
         binding.moreOptionsButton.setOnLongClickListener(null);
@@ -329,6 +357,81 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
         ViewCompat.setOnApplyWindowInsetsListener(binding.itemsListPanel, null);
 
         binding.playbackControlRoot.removeOnLayoutChangeListener(onLayoutChangeListener);
+    }
+
+    private boolean isPlayerButtonPreference(@Nullable final String key) {
+        return key != null && (
+                key.equals(context.getString(R.string.player_button_left_outer_key))
+                        || key.equals(context.getString(R.string.player_button_left_inner_key))
+                        || key.equals(context.getString(R.string.player_button_right_inner_key))
+                        || key.equals(context.getString(R.string.player_button_right_outer_key)));
+    }
+
+    private void setupPlayerButtonActions() {
+        leftOuterAction = getPlayerButtonAction(R.string.player_button_left_outer_key,
+                PLAYER_BUTTON_ACTION_PREVIOUS);
+        leftInnerAction = getPlayerButtonAction(R.string.player_button_left_inner_key,
+                PLAYER_BUTTON_ACTION_REWIND);
+        rightInnerAction = getPlayerButtonAction(R.string.player_button_right_inner_key,
+                PLAYER_BUTTON_ACTION_FORWARD);
+        rightOuterAction = getPlayerButtonAction(R.string.player_button_right_outer_key,
+                PLAYER_BUTTON_ACTION_NEXT);
+
+        configurePlayerButton(binding.playerButtonLeftOuter, leftOuterAction);
+        configurePlayerButton(binding.playerButtonLeftInner, leftInnerAction);
+        configurePlayerButton(binding.playerButtonRightInner, rightInnerAction);
+        configurePlayerButton(binding.playerButtonRightOuter, rightOuterAction);
+
+        showOrHideButtons();
+    }
+
+    @NonNull
+    private String getPlayerButtonAction(@StringRes final int keyRes,
+                                         @NonNull final String defaultValue) {
+        final String action = player.getPrefs().getString(context.getString(keyRes), defaultValue);
+        return action == null ? defaultValue : action;
+    }
+
+    private void configurePlayerButton(@NonNull final AppCompatImageButton button,
+                                       @NonNull final String action) {
+        switch (action) {
+            case PLAYER_BUTTON_ACTION_PREVIOUS:
+                button.setImageResource(R.drawable.ic_previous);
+                button.setContentDescription(context.getString(R.string.previous_stream));
+                button.setOnClickListener(makeOnClickListener(player::playPrevious));
+                break;
+
+            case PLAYER_BUTTON_ACTION_REWIND:
+                button.setImageResource(
+                        com.google.android.exoplayer2.ui.R.drawable.exo_controls_rewind);
+                button.setContentDescription(context.getString(R.string.rewind));
+                button.setOnClickListener(makeOnClickListener(player::fastRewind));
+                break;
+
+            case PLAYER_BUTTON_ACTION_FORWARD:
+                button.setImageResource(
+                        com.google.android.exoplayer2.ui.R.drawable.exo_controls_fastforward);
+                button.setContentDescription(context.getString(R.string.forward));
+                button.setOnClickListener(makeOnClickListener(player::fastForward));
+                break;
+
+            case PLAYER_BUTTON_ACTION_NEXT:
+                button.setImageResource(R.drawable.ic_next);
+                button.setContentDescription(context.getString(R.string.next_stream));
+                button.setOnClickListener(makeOnClickListener(player::playNext));
+                break;
+
+            case PLAYER_BUTTON_ACTION_NOTHING:
+            default:
+                button.setImageDrawable(null);
+                button.setContentDescription(null);
+                button.setOnClickListener(null);
+                break;
+        }
+
+        final boolean isNothing = PLAYER_BUTTON_ACTION_NOTHING.equals(action);
+        button.setVisibility(isNothing ? View.INVISIBLE : View.VISIBLE);
+        button.setAlpha(isNothing ? 0.0f : 1.0f);
     }
 
     /**
@@ -802,10 +905,33 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
         final boolean showPrev = playQueue.getIndex() != 0;
         final boolean showNext = playQueue.getIndex() + 1 != playQueue.getStreams().size();
 
-        binding.playPreviousButton.setVisibility(showPrev ? View.VISIBLE : View.INVISIBLE);
-        binding.playPreviousButton.setAlpha(showPrev ? 1.0f : 0.0f);
-        binding.playNextButton.setVisibility(showNext ? View.VISIBLE : View.INVISIBLE);
-        binding.playNextButton.setAlpha(showNext ? 1.0f : 0.0f);
+        updatePlayerButtonVisibility(binding.playerButtonLeftOuter, leftOuterAction,
+                showPrev, showNext);
+        updatePlayerButtonVisibility(binding.playerButtonLeftInner, leftInnerAction,
+                showPrev, showNext);
+        updatePlayerButtonVisibility(binding.playerButtonRightInner, rightInnerAction,
+                showPrev, showNext);
+        updatePlayerButtonVisibility(binding.playerButtonRightOuter, rightOuterAction,
+                showPrev, showNext);
+    }
+
+    private void updatePlayerButtonVisibility(@NonNull final View button,
+                                              @NonNull final String action,
+                                              final boolean showPrev,
+                                              final boolean showNext) {
+        final boolean visible;
+        if (PLAYER_BUTTON_ACTION_NOTHING.equals(action)) {
+            visible = false;
+        } else if (PLAYER_BUTTON_ACTION_PREVIOUS.equals(action)) {
+            visible = showPrev;
+        } else if (PLAYER_BUTTON_ACTION_NEXT.equals(action)) {
+            visible = showNext;
+        } else {
+            visible = true;
+        }
+
+        button.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+        button.setAlpha(visible ? 1.0f : 0.0f);
     }
 
     protected void showSystemUIPartially() {
@@ -971,25 +1097,18 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
 
     private void animatePlayButtons(final boolean show, final long duration) {
         animate(binding.playPauseButton, show, duration, AnimationType.SCALE_AND_ALPHA);
+        animatePlayerButton(binding.playerButtonLeftOuter, leftOuterAction, show, duration);
+        animatePlayerButton(binding.playerButtonLeftInner, leftInnerAction, show, duration);
+        animatePlayerButton(binding.playerButtonRightInner, rightInnerAction, show, duration);
+        animatePlayerButton(binding.playerButtonRightOuter, rightOuterAction, show, duration);
+    }
 
-        @Nullable final PlayQueue playQueue = player.getPlayQueue();
-        if (playQueue == null) {
-            return;
-        }
-
-        if (!show || playQueue.getIndex() > 0) {
-            animate(
-                    binding.playPreviousButton,
-                    show,
-                    duration,
-                    AnimationType.SCALE_AND_ALPHA);
-        }
-        if (!show || playQueue.getIndex() + 1 < playQueue.getStreams().size()) {
-            animate(
-                    binding.playNextButton,
-                    show,
-                    duration,
-                    AnimationType.SCALE_AND_ALPHA);
+    private void animatePlayerButton(@NonNull final View button,
+                                     @NonNull final String action,
+                                     final boolean show,
+                                     final long duration) {
+        if (!PLAYER_BUTTON_ACTION_NOTHING.equals(action)) {
+            animate(button, show, duration, AnimationType.SCALE_AND_ALPHA);
         }
     }
     //endregion

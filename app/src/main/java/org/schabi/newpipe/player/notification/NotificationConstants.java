@@ -2,6 +2,7 @@ package org.schabi.newpipe.player.notification;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.IntDef;
@@ -92,14 +93,64 @@ public final class NotificationConstants {
     };
 
 
+    public static boolean isHidePrevNext(@NonNull final Context context,
+                                         @NonNull final SharedPreferences prefs) {
+        return prefs.getBoolean(
+                context.getString(R.string.media_session_hide_prev_next_key), true);
+    }
+
     @Action
     public static final int[] SLOT_DEFAULTS = {
-            SMART_REWIND_PREVIOUS,
+            PREVIOUS,
+            REWIND,
             PLAY_PAUSE_BUFFERING,
-            SMART_FORWARD_NEXT,
-            REPEAT,
-            CLOSE,
+            FORWARD,
+            NEXT,
     };
+
+    /**
+     * Returns the default action for a notification slot.
+     *
+     * <p>When OS-level prev/next are hidden, the four custom slots default to
+     * [NOTHING, REWIND, PLAY_PAUSE_BUFFERING, FORWARD, NOTHING], leaving only rewind, play/pause
+     * and forward. On pre-Android 13, or when OS-level prev/next are not hidden, the slots default
+     * to [PREVIOUS, REWIND, PLAY_PAUSE_BUFFERING, FORWARD, NEXT]. On Android 13+ with OS-level
+     * prev/next visible, the system locks previous/next/play in the center and only allows
+     * customizing the two outer actions (slots 3 and 4), which default to REWIND and FORWARD.</p>
+     *
+     * @param context the application context
+     * @param prefs the shared preferences
+     * @param slot the index of the notification slot (0-4)
+     * @return the default action for the given slot
+     */
+    @Action
+    public static int getDefaultAction(@NonNull final Context context,
+                                       @NonNull final SharedPreferences prefs,
+                                       final int slot) {
+        final boolean hidePrevNext = isHidePrevNext(context, prefs);
+        if (hidePrevNext) {
+            switch (slot) {
+                case 0:
+                case 4:
+                    return NOTHING;
+                case 1:
+                    return REWIND;
+                case 3:
+                    return FORWARD;
+                default:
+                    return SLOT_DEFAULTS[slot];
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (slot == 3) {
+                return REWIND;
+            } else if (slot == 4) {
+                return FORWARD;
+            }
+        }
+        return SLOT_DEFAULTS[slot];
+    }
 
     public static final int[] SLOT_PREF_KEYS = {
             R.string.notification_slot_0_key,
@@ -110,7 +161,7 @@ public final class NotificationConstants {
     };
 
 
-    public static final List<Integer> SLOT_COMPACT_DEFAULTS = List.of(0, 1, 2);
+    public static final List<Integer> SLOT_COMPACT_DEFAULTS = List.of(1, 2, 3);
 
     public static final int[] SLOT_COMPACT_PREF_KEYS = {
             R.string.notification_slot_compact_0_key,

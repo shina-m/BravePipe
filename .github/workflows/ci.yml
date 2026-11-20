@@ -63,14 +63,17 @@ jobs:
       - name: Build braveConscrypt flavor
         run: ./gradlew assembleBraveConscryptDebug
 
-      - name: Prepare for building braveLegacy flavor
-        run: ./gradlew prepareLegacyFlavor
-
-      - name: Build braveLegacy flavor
-        run: ./gradlew assembleBraveLegacyDebug
-
-      - name: Unprepare for building braveLegacy flavor
-        run: ./gradlew unPrepareLegacyFlavor
+      # braveLegacy (SDK 19) is disabled for now: NewPipe 0.29 requires minSdk 23
+      # (Room 3 and the new Compose "shared" module), so the KitKat flavor needs a
+      # database-layer port and Compose exclusions before it can be built again.
+      # - name: Prepare for building braveLegacy flavor
+      #   run: ./gradlew prepareLegacyFlavor
+      #
+      # - name: Build braveLegacy flavor
+      #   run: ./gradlew assembleBraveLegacyDebug
+      #
+      # - name: Unprepare for building braveLegacy flavor
+      #   run: ./gradlew unPrepareLegacyFlavor
 
       - name: Upload APK
         uses: actions/upload-artifact@v7
@@ -119,7 +122,7 @@ jobs:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
           arch: ${{ matrix.arch }}
-          script: ./gradlew connectedCheck --stacktrace
+          script: ./gradlew connectedBraveDebugAndroidTest --stacktrace
 
       - name: Upload test report when tests fail # because the printed out stacktrace (console) is too short, see also #7553
         uses: actions/upload-artifact@v7
