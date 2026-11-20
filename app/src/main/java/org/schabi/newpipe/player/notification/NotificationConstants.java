@@ -96,18 +96,18 @@ public final class NotificationConstants {
     @Action
     public static final int[] SLOT_DEFAULTS = {
             REWIND,
-            PREVIOUS,
+            NOTHING,
             PLAY_PAUSE_BUFFERING,
-            NEXT,
+            NOTHING,
             FORWARD,
     };
 
     /**
      * Returns the default action for a notification slot.
      *
-     * <p>The default layout puts rewind and forward before previous and next. On Android 13+ the
-     * system always shows previous, play/pause and next together, and only allows customizing the
-     * two actions displayed around them, so those slots default to rewind and forward.</p>
+     * <p>The default layout shows only rewind, play/pause and forward (no previous/next). On
+     * Android 13+ the system only allows customizing two actions around play/pause, so those
+     * slots default to rewind and forward.</p>
      *
      * @param slot the index of the notification slot (0-4)
      * @return the default action for the given slot
