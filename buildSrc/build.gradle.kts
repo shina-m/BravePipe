@@ -9,4 +9,6 @@ plugins {
 
 repositories {
     gradlePluginPortal()
+    // Kotlin artifacts required by the kotlin-dsl plugin are not on the plugin portal
+    mavenCentral()
 }
