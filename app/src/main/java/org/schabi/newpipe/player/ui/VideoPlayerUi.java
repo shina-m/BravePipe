@@ -223,6 +223,8 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
 
         binding.playPauseButton.setOnClickListener(makeOnClickListener(player::playPause));
         binding.playPreviousButton.setOnClickListener(makeOnClickListener(player::playPrevious));
+        binding.fastRewindButton.setOnClickListener(makeOnClickListener(player::fastRewind));
+        binding.fastForwardButton.setOnClickListener(makeOnClickListener(player::fastForward));
         binding.playNextButton.setOnClickListener(makeOnClickListener(player::playNext));
 
         binding.moreOptionsButton.setOnClickListener(
@@ -304,6 +306,8 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
 
         binding.playPauseButton.setOnClickListener(null);
         binding.playPreviousButton.setOnClickListener(null);
+        binding.fastRewindButton.setOnClickListener(null);
+        binding.fastForwardButton.setOnClickListener(null);
         binding.playNextButton.setOnClickListener(null);
 
         binding.moreOptionsButton.setOnClickListener(null);
@@ -922,6 +926,8 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
 
     private void animatePlayButtons(final boolean show, final long duration) {
         animate(binding.playPauseButton, show, duration, AnimationType.SCALE_AND_ALPHA);
+        animate(binding.fastRewindButton, show, duration, AnimationType.SCALE_AND_ALPHA);
+        animate(binding.fastForwardButton, show, duration, AnimationType.SCALE_AND_ALPHA);
 
         @Nullable final PlayQueue playQueue = player.getPlayQueue();
         if (playQueue == null) {

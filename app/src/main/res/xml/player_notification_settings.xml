@@ -28,7 +28,7 @@
         app:iconSpaceReserved="false" />
 
     <SwitchPreferenceCompat
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="@string/media_session_hide_prev_next_key"
         android:summary="@string/media_session_hide_prev_next_summary"
         android:title="@string/media_session_hide_prev_next_title"

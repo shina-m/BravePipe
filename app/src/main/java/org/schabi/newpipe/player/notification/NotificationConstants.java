@@ -96,24 +96,24 @@ public final class NotificationConstants {
     public static boolean isHidePrevNext(@NonNull final Context context,
                                          @NonNull final SharedPreferences prefs) {
         return prefs.getBoolean(
-                context.getString(R.string.media_session_hide_prev_next_key), false);
+                context.getString(R.string.media_session_hide_prev_next_key), true);
     }
 
     @Action
     public static final int[] SLOT_DEFAULTS = {
-            REWIND,
             PREVIOUS,
+            REWIND,
             PLAY_PAUSE_BUFFERING,
-            NEXT,
             FORWARD,
+            NEXT,
     };
 
     /**
      * Returns the default action for a notification slot.
      *
      * <p>When OS-level prev/next are hidden or on pre-Android 13, the slots default to
-     * [REWIND, PREVIOUS, PLAY_PAUSE_BUFFERING, NEXT, FORWARD], so rewind/forward are shown before
-     * previous/next. On Android 13+ when OS-level prev/next are NOT hidden, the system locks
+     * [PREVIOUS, REWIND, PLAY_PAUSE_BUFFERING, FORWARD, NEXT], so rewind/forward sit next to
+     * play/pause. On Android 13+ when OS-level prev/next are NOT hidden, the system locks
      * previous/next/play in the center and only allows customizing the two outer actions (slots 3
      * and 4), which default to REWIND and FORWARD.</p>
      *
@@ -146,7 +146,7 @@ public final class NotificationConstants {
     };
 
 
-    public static final List<Integer> SLOT_COMPACT_DEFAULTS = List.of(0, 2, 4);
+    public static final List<Integer> SLOT_COMPACT_DEFAULTS = List.of(1, 2, 3);
 
     public static final int[] SLOT_COMPACT_PREF_KEYS = {
             R.string.notification_slot_compact_0_key,
