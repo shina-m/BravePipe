@@ -149,7 +149,7 @@ configure<ApplicationExtension> {
         val braveVersionCode = 590000
         // -> our versionName will be added as suffix to defaultConfig.versionName
         // We use major.minor.patch
-        val braveVersionName = "2.9.1"
+        val braveVersionName = "2.9.2"
 
         create("sponsorblock") { // only for strings of sponsorblock stuff
             dimension = "default"
