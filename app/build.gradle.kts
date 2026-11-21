@@ -24,7 +24,7 @@ plugins {
 val gitWorkingBranch = providers.exec {
     commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
 }.standardOutput.asText.map { it.trim() }
-val defaultBranches = listOf("master", "dev")
+val defaultBranches = listOf("master", "main")
 val workingBranch = gitWorkingBranch.getOrElse("")
 val normalizedWorkingBranch = workingBranch
     .replaceFirst("^[^A-Za-z]+".toRegex(), "")
@@ -97,7 +97,7 @@ configure<ApplicationExtension> {
             if (samePackageAsBase) {
                 // Keep the flavor's application ID and app name.
             } else if (normalizedWorkingBranch.isEmpty() || workingBranch in defaultBranches) {
-                // default values when branch name could not be determined or is master or dev
+                // default values when branch name could not be determined or is master or main
                 applicationIdSuffix = ".debug"
                 resValue("string", "app_name", "BravePipe Debug")
             } else {

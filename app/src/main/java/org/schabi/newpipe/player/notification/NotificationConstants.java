@@ -96,15 +96,15 @@ public final class NotificationConstants {
     public static boolean isHidePrevNext(@NonNull final Context context,
                                          @NonNull final SharedPreferences prefs) {
         return prefs.getBoolean(
-                context.getString(R.string.media_session_hide_prev_next_key), true);
+                context.getString(R.string.media_session_hide_prev_next_key), false);
     }
 
     @Action
     public static final int[] SLOT_DEFAULTS = {
             PREVIOUS,
-            REWIND,
+            NOTHING,
             PLAY_PAUSE_BUFFERING,
-            FORWARD,
+            NOTHING,
             NEXT,
     };
 
@@ -113,10 +113,10 @@ public final class NotificationConstants {
      *
      * <p>When OS-level prev/next are hidden, the four custom slots default to
      * [NOTHING, REWIND, PLAY_PAUSE_BUFFERING, FORWARD, NOTHING], leaving only rewind, play/pause
-     * and forward. On pre-Android 13, or when OS-level prev/next are not hidden, the slots default
-     * to [PREVIOUS, REWIND, PLAY_PAUSE_BUFFERING, FORWARD, NEXT]. On Android 13+ with OS-level
-     * prev/next visible, the system locks previous/next/play in the center and only allows
-     * customizing the two outer actions (slots 3 and 4), which default to REWIND and FORWARD.</p>
+     * and forward. On Android 13+ with OS-level prev/next visible, the two custom outer slots
+     * default to NOTHING, leaving the system previous, play/pause and next buttons. On
+     * pre-Android 13 with OS-level prev/next visible, the slots default to
+     * [PREVIOUS, NOTHING, PLAY_PAUSE_BUFFERING, NOTHING, NEXT].</p>
      *
      * @param context the application context
      * @param prefs the shared preferences
@@ -127,6 +127,14 @@ public final class NotificationConstants {
     public static int getDefaultAction(@NonNull final Context context,
                                        @NonNull final SharedPreferences prefs,
                                        final int slot) {
+        return getDefaultAction(context, prefs, slot, Build.VERSION.SDK_INT);
+    }
+
+    @Action
+    static int getDefaultAction(@NonNull final Context context,
+                                @NonNull final SharedPreferences prefs,
+                                final int slot,
+                                final int sdkInt) {
         final boolean hidePrevNext = isHidePrevNext(context, prefs);
         if (hidePrevNext) {
             switch (slot) {
@@ -142,11 +150,9 @@ public final class NotificationConstants {
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (slot == 3) {
-                return REWIND;
-            } else if (slot == 4) {
-                return FORWARD;
+        if (sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+            if (slot == 3 || slot == 4) {
+                return NOTHING;
             }
         }
         return SLOT_DEFAULTS[slot];
@@ -161,7 +167,7 @@ public final class NotificationConstants {
     };
 
 
-    public static final List<Integer> SLOT_COMPACT_DEFAULTS = List.of(1, 2, 3);
+    public static final List<Integer> SLOT_COMPACT_DEFAULTS = List.of(0, 2, 4);
 
     public static final int[] SLOT_COMPACT_PREF_KEYS = {
             R.string.notification_slot_compact_0_key,

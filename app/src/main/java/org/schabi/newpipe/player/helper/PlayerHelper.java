@@ -467,7 +467,7 @@ public final class PlayerHelper {
     public static boolean isNotificationPrevNextAsSeek(@NonNull final Context context,
                                                         @NonNull final SharedPreferences prefs) {
         return prefs.getBoolean(context.getString(R.string.notification_prev_next_as_seek_key),
-                false);
+                true);
     }
 
     public static boolean isPlayerPrevNextAsSeek(@NonNull final Context context,

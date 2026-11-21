@@ -161,10 +161,10 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
     @Nullable
     private View.OnLayoutChangeListener onLayoutChangeListener = null;
 
-    private String leftOuterAction = PLAYER_BUTTON_ACTION_PREVIOUS;
-    private String leftInnerAction = PLAYER_BUTTON_ACTION_REWIND;
-    private String rightInnerAction = PLAYER_BUTTON_ACTION_FORWARD;
-    private String rightOuterAction = PLAYER_BUTTON_ACTION_NEXT;
+    private String leftOuterAction = PLAYER_BUTTON_ACTION_NOTHING;
+    private String leftInnerAction = PLAYER_BUTTON_ACTION_NOTHING;
+    private String rightInnerAction = PLAYER_BUTTON_ACTION_NOTHING;
+    private String rightOuterAction = PLAYER_BUTTON_ACTION_NOTHING;
     private boolean playerPrevNextAsSeek;
     @Nullable
     private SharedPreferences.OnSharedPreferenceChangeListener playerButtonsListener;
@@ -372,13 +372,13 @@ public abstract class VideoPlayerUi extends PlayerUi implements SeekBar.OnSeekBa
     private void setupPlayerButtonActions() {
         playerPrevNextAsSeek = PlayerHelper.isPlayerPrevNextAsSeek(context, player.getPrefs());
         leftOuterAction = getPlayerButtonAction(R.string.player_button_left_outer_key,
-                PLAYER_BUTTON_ACTION_PREVIOUS);
+                PLAYER_BUTTON_ACTION_NOTHING);
         leftInnerAction = getPlayerButtonAction(R.string.player_button_left_inner_key,
-                PLAYER_BUTTON_ACTION_REWIND);
+                PLAYER_BUTTON_ACTION_NOTHING);
         rightInnerAction = getPlayerButtonAction(R.string.player_button_right_inner_key,
-                PLAYER_BUTTON_ACTION_FORWARD);
+                PLAYER_BUTTON_ACTION_NOTHING);
         rightOuterAction = getPlayerButtonAction(R.string.player_button_right_outer_key,
-                PLAYER_BUTTON_ACTION_NEXT);
+                PLAYER_BUTTON_ACTION_NOTHING);
 
         configurePlayerButton(binding.playerButtonLeftOuter, leftOuterAction);
         configurePlayerButton(binding.playerButtonLeftInner, leftInnerAction);

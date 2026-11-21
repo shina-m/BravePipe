@@ -2,7 +2,7 @@ name: Android Build Release Workflow
 
 on:
   push:
-    #branches: [ dev ]
+    #branches: [ main ]
     tags:
       - '*'
 
