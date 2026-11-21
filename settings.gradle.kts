@@ -2,6 +2,8 @@
  * SPDX-FileCopyrightText: 2025 NewPipe e.V. <https://newpipe-ev.de>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+rootProject.name = "NewPipe"
 
 pluginManagement {
     includeBuild("build-logic/brave-pipe-plugin")
@@ -11,6 +13,7 @@ pluginManagement {
         mavenCentral()
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -22,18 +25,26 @@ dependencyResolutionManagement {
         maven(url = "https://repo.clojars.org")
     }
 }
-include (":app")
+include(":app") // androidApp
+include(":desktopApp")
+include("shared")
 
 // Use a local copy of NewPipe Extractor by uncommenting the lines below.
 // We assume, that NewPipe and NewPipe Extractor have the same parent directory.
 // If this is not the case, please change the path in includeBuild().
 
-//includeBuild("../BravePipeExtractor") {
-//    dependencySubstitution {
-//        substitute(module("com.github.bravepipeproject:extractor"))
-//            .using(project(":extractor"))
-//    }
-//}
+// Use the checked out BravePipeExtractor repository (the submodule, or a sibling checkout
+// for local development) with upstream rebased in, instead of the published extractor.
+val bravePipeExtractorDir = listOf(file("BravePipeExtractor"), file("../BravePipeExtractor"))
+    .firstOrNull { it.exists() }
+if (bravePipeExtractorDir != null) {
+    includeBuild(bravePipeExtractorDir) {
+        dependencySubstitution {
+            substitute(module("com.github.bravepipeproject:extractor"))
+                .using(project(":extractor"))
+        }
+    }
+}
 
 //includeBuild("../logcat-toolkit") {
 //    dependencySubstitution {

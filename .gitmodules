@@ -1,0 +1,4 @@
+[submodule "BravePipeExtractor"]
+	path = BravePipeExtractor
+	url = https://github.com/shina-m/BravePipeExtractor.git
+	branch = dev-0.27.1

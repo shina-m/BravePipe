@@ -38,7 +38,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - uses: gradle/actions/wrapper-validation@v5
+        with:
+          submodules: recursive
+      - uses: gradle/actions/wrapper-validation@v6
 
       - name: create and checkout branch
         # push events already checked out the branch
@@ -57,23 +59,29 @@ jobs:
       - name: Rename strings from NewPipe to BravePipe
         run: ./gradlew bravify
 
+      - name: Format Kotlin after bravify
+        run: ./gradlew formatKtlint
+
       - name: Build brave flavor
         run: ./gradlew assembleBraveDebug
 
       - name: Build braveConscrypt flavor
         run: ./gradlew assembleBraveConscryptDebug
 
-      - name: Prepare for building braveLegacy flavor
-        run: ./gradlew prepareLegacyFlavor
-
-      - name: Build braveLegacy flavor
-        run: ./gradlew assembleBraveLegacyDebug
-
-      - name: Unprepare for building braveLegacy flavor
-        run: ./gradlew unPrepareLegacyFlavor
+      # braveLegacy (SDK 19) is disabled for now: NewPipe 0.29 requires minSdk 23
+      # (Room 3 and the new Compose "shared" module), so the KitKat flavor needs a
+      # database-layer port and Compose exclusions before it can be built again.
+      # - name: Prepare for building braveLegacy flavor
+      #   run: ./gradlew prepareLegacyFlavor
+      #
+      # - name: Build braveLegacy flavor
+      #   run: ./gradlew assembleBraveLegacyDebug
+      #
+      # - name: Unprepare for building braveLegacy flavor
+      #   run: ./gradlew unPrepareLegacyFlavor
 
       - name: Upload APK
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: app
           path: app/build/outputs/apk/brave*/debug/*.apk
@@ -87,7 +95,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - api-level: 21
+          - api-level: 23
             target: default
             arch: x86
           - api-level: 35
@@ -99,6 +107,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          submodules: recursive
 
       - name: Enable KVM
         run: |
@@ -122,7 +132,7 @@ jobs:
           script: ./gradlew connectedBraveDebugAndroidTest --stacktrace
 
       - name: Upload test report when tests fail # because the printed out stacktrace (console) is too short, see also #7553
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: android-test-report-api${{ matrix.api-level }}

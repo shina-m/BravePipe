@@ -9,12 +9,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
+import android.text.Layout;
+import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.style.AlignmentSpan;
 import android.text.style.CharacterStyle;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -37,6 +44,7 @@ import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.core.view.SoftwareKeyboardControllerCompat;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -73,7 +81,6 @@ import org.schabi.newpipe.settings.NewPipeSettings;
 import org.schabi.newpipe.util.Constants;
 import org.schabi.newpipe.util.DeviceUtils;
 import org.schabi.newpipe.util.ExtractorHelper;
-import org.schabi.newpipe.util.KeyboardUtil;
 import org.schabi.newpipe.util.NavigationHelper;
 
 import java.util.ArrayList;
@@ -501,6 +508,15 @@ public class SearchFragment extends BaseListFragment<SearchInfo, ListExtractor.I
         inflater.inflate(R.menu.menu_search_fragment, menu);
     }
 
+    private SpannableString getStyledHeader(final String title) {
+        final SpannableString styledTitle = new SpannableString(title);
+        styledTitle.setSpan(new StyleSpan(Typeface.BOLD), 0, title.length(), 0);
+        styledTitle.setSpan(new ForegroundColorSpan(Color.GRAY), 0, title.length(), 0);
+        styledTitle.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER),
+                0, title.length(), 0);
+        return styledTitle;
+    }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
         if (item.getItemId() == R.id.action_filter) {
@@ -696,15 +712,15 @@ public class SearchFragment extends BaseListFragment<SearchInfo, ListExtractor.I
         if (DEBUG) {
             Log.d(TAG, "showKeyboardSearch() called");
         }
-        KeyboardUtil.showKeyboard(activity, searchEditText);
+        new SoftwareKeyboardControllerCompat(searchEditText).show();
     }
 
     protected void hideKeyboardSearch() {
         if (DEBUG) {
             Log.d(TAG, "hideKeyboardSearch() called");
         }
-
-        KeyboardUtil.hideKeyboard(activity, searchEditText);
+        new SoftwareKeyboardControllerCompat(searchEditText).hide();
+        searchEditText.clearFocus();
     }
 
     private void showDeleteSuggestionDialog(final SuggestionItem item) {

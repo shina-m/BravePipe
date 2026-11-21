@@ -930,7 +930,7 @@ public class DownloadDialog extends BraveDownloadDialog
                 } else if (targetFile == null) {
                     // This part is called if:
                     // * the filename is not used in a pending/finished download
-                    // * the file does not exists, create
+                    // * the file does not exist, create
 
                     if (!mainStorage.mkdirs()) {
                         showFailedDialog(R.string.error_path_creation);

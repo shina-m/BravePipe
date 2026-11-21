@@ -6,22 +6,29 @@
 import com.android.build.api.dsl.ApplicationExtension
 import java.io.FileInputStream
 import java.util.Properties
+import java.util.regex.Pattern
 
 plugins {
     id("brave.pipe.plugin")
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.jetbrains.kotlin.kapt)
+    alias(libs.plugins.android.legacy.kapt)
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.jetbrains.kotlin.parcelize)
     alias(libs.plugins.jetbrains.kotlinx.serialization)
     alias(libs.plugins.sonarqube)
+    alias(libs.plugins.about.libraries)
+    alias(libs.plugins.androidx.room)
     checkstyle
 }
 
 val gitWorkingBranch = providers.exec {
     commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
 }.standardOutput.asText.map { it.trim() }
+val defaultBranches = listOf("master", "dev")
+val workingBranch = gitWorkingBranch.getOrElse("")
+val normalizedWorkingBranch = workingBranch
+    .replaceFirst("^[^A-Za-z]+".toRegex(), "")
+    .replace("[^0-9A-Za-z]+".toRegex(), "")
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties().apply {
@@ -37,27 +44,30 @@ java {
 }
 
 kotlin {
-    compilerOptions {
-        // TODO: Drop annotation default target when it is stable
-        freeCompilerArgs.addAll(
-            "-Xannotation-default-target=param-property"
-        )
-    }
+    jvmToolchain(21)
 }
 
 configure<ApplicationExtension> {
-    compileSdk = 36
-    namespace = "org.schabi.newpipe"
+    compileSdk {
+        version = release(NEWPIPE_VERSION_SDK_COMPILE_MAJOR) {
+            minorApiLevel = NEWPIPE_VERSION_SDK_COMPILE_MINOR
+        }
+    }
+    namespace = NEWPIPE_APPLICATION_ID_OLD
 
     defaultConfig {
-        applicationId = "org.schabi.newpipe"
+        applicationId = NEWPIPE_APPLICATION_ID_OLD
         resValue("string", "app_name", "NewPipe")
-        minSdk = 21
-        targetSdk = 35
+        minSdk {
+            version = release(NEWPIPE_VERSION_SDK_MIN)
+        }
+        targetSdk {
+            version = release(NEWPIPE_VERSION_SDK_TARGET)
+        }
 
-        versionCode = System.getProperty("versionCodeOverride")?.toInt() ?: 1013
+        versionCode = System.getProperty("versionCodeOverride")?.toInt() ?: NEWPIPE_VERSION_CODE
 
-        versionName = "0.28.8"
+        versionName = NEWPIPE_VERSION_NAME
         System.getProperty("versionNameSuffix")?.let { versionNameSuffix = it }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -84,12 +94,6 @@ configure<ApplicationExtension> {
             val samePackageAsBase = System.getProperty("samePackageAsBase") != null
 
             // suffix the app id and the app name with git branch name
-            val defaultBranches = listOf("master", "dev")
-            val workingBranch = gitWorkingBranch.getOrElse("")
-            val normalizedWorkingBranch = workingBranch
-                .replaceFirst("^[^A-Za-z]+".toRegex(), "")
-                .replace("[^0-9A-Za-z]+".toRegex(), "")
-
             if (samePackageAsBase) {
                 // Keep the flavor's application ID and app name.
             } else if (normalizedWorkingBranch.isEmpty() || workingBranch in defaultBranches) {
@@ -118,6 +122,21 @@ configure<ApplicationExtension> {
                 "proguard-rules.pro"
             )
         }
+
+        register("continuous") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            isDefault = true
+
+            // suffix the app id and the app name with git branch name
+            if (normalizedWorkingBranch.isEmpty() || workingBranch in defaultBranches) {
+                applicationIdSuffix = ".continuous"
+                resValue("string", "app_name", "NewPipe Continuous")
+            } else {
+                applicationIdSuffix = ".continuous.$normalizedWorkingBranch"
+                resValue("string", "app_name", "NewPipe $workingBranch")
+            }
+        }
     }
 
     // use productFlavors to keep the name/version changes AFAP for BravePipe
@@ -127,18 +146,15 @@ configure<ApplicationExtension> {
         // the amount of trailing zeros depends on the amount of digits the
         // defaultConfig.versionCode has -> we just prepend our increasing
         // versionCode before those zeros.
-        val braveVersionCode = 580000
+        val braveVersionCode = 590000
         // -> our versionName will be added as suffix to defaultConfig.versionName
         // We use major.minor.patch
-        val braveVersionName = "2.8.2"
+        val braveVersionName = "2.9.2"
 
         create("sponsorblock") { // only for strings of sponsorblock stuff
             dimension = "default"
             android.sourceSets.getByName("sponsorblock") {
-                res.srcDirs(listOf(
-                    "src/sponsorblock/res",
-                    android.sourceSets.getByName("sponsorblock").res.srcDirs
-                ))
+                res.srcDirs("src/sponsorblock/res")
             }
         }
 
@@ -151,10 +167,7 @@ configure<ApplicationExtension> {
             versionName = "${defaultConfig.versionName}-$braveVersionName"
 
             android.sourceSets.getByName("brave") {
-                res.srcDirs(listOf(
-                    "src/brave/res",
-                    android.sourceSets.getByName("sponsorblock").res.srcDirs
-                ))
+                res.srcDirs("src/brave/res", "src/sponsorblock/res")
             }
         }
 
@@ -166,9 +179,7 @@ configure<ApplicationExtension> {
             versionName = "${defaultConfig.versionName}-$braveVersionName"
 
             android.sourceSets.getByName("braveConscrypt") {
-                res.srcDirs(listOf(
-                    android.sourceSets.getByName("brave").res.srcDirs
-                ))
+                res.srcDirs("src/brave/res", "src/sponsorblock/res")
             }
 
             //noinspection WrongGradleMethod
@@ -185,10 +196,7 @@ configure<ApplicationExtension> {
             versionName = "${defaultConfig.versionName}-$braveVersionName"
 
             android.sourceSets.getByName("braveLegacy") {
-                res.srcDirs(listOf(
-                    "src/braveLegacy/res",
-                    android.sourceSets.getByName("braveConscrypt").res.srcDirs
-                ))
+                res.srcDirs("src/braveLegacy/res", "src/brave/res", "src/sponsorblock/res")
             }
 
             multiDexEnabled = true
@@ -245,20 +253,12 @@ configure<ApplicationExtension> {
     }
 }
 
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
+room3 {
+    schemaDirectory("$projectDir/schemas")
 }
-
 
 // Custom dependency configuration for ktlint
 val ktlint by configurations.creating
-
-// https://checkstyle.org/#JRE_and_JDK
-tasks.withType<Checkstyle>().configureEach {
-    javaLauncher = javaToolchains.launcherFor {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
 
 checkstyle {
     configDirectory = rootProject.file("checkstyle")
@@ -330,19 +330,20 @@ sonar {
 }
 
 dependencies {
-    /** Desugaring **/
+    // Desugaring
     coreLibraryDesugaring(libs.android.desugar)
 
-    /** NewPipe libraries **/
+    // NewPipe libraries
+    implementation(projects.shared)
     implementation(libs.newpipe.nanojson)
     implementation(libs.newpipe.extractor)
     implementation(libs.newpipe.filepicker)
 
-    /** Checkstyle **/
+    // Checkstyle
     checkstyle(libs.puppycrawl.checkstyle)
     ktlint(libs.pinterest.ktlint)
 
-    /** AndroidX **/
+    // AndroidX
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.constraintlayout)
@@ -357,6 +358,7 @@ dependencies {
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.rxjava3)
+    implementation(libs.androidx.sqlite.bundled)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.androidx.viewpager2)
@@ -371,7 +373,7 @@ dependencies {
     // Kotlinx Serialization
     implementation(libs.kotlinx.serialization.json)
 
-    /** Third-party libraries **/
+    // Third-party libraries
     implementation(libs.livefront.bridge)
     implementation(libs.evernote.statesaver.core)
     kapt(libs.evernote.statesaver.compiler)
@@ -381,6 +383,7 @@ dependencies {
 
     // HTTP client
     implementation(libs.squareup.okhttp)
+    implementation(libs.squareup.okhttp.brotli)
 
     // Media player
     implementation(libs.google.exoplayer.core)
@@ -421,8 +424,7 @@ dependencies {
     // Date and time formatting
     implementation(libs.ocpsoft.prettytime)
 
-    /** Debugging **/
-    // Memory leak detection
+    // Debugging and memory leak detection
     debugImplementation(libs.squareup.leakcanary.watcher)
     debugImplementation(libs.squareup.leakcanary.plumber)
     debugImplementation(libs.squareup.leakcanary.core)
@@ -430,7 +432,7 @@ dependencies {
     debugImplementation(libs.facebook.stetho.core)
     debugImplementation(libs.facebook.stetho.okhttp3)
 
-    /** Testing **/
+    // Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
 
@@ -438,6 +440,25 @@ dependencies {
     androidTestImplementation(libs.androidx.runner)
     androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.assertj.core)
+    androidTestImplementation(libs.androidx.sqlite.bundled)
+    androidTestImplementation(libs.jetbrains.coroutines.test)
+}
+
+aboutLibraries {
+    collect {
+        configPath = file("../config/aboutlibraries")
+    }
+    export {
+        outputFile = file("../shared/src/androidMain/assets/aboutlibraries.json")
+        prettyPrint = true
+        excludeFields.addAll("organization", "scm", "funding")
+    }
+    library {
+        exclusionPatterns = listOf(
+            Pattern.compile("^com\\.github\\.TeamNewPipe:NewPipeExtractor$"),
+            Pattern.compile("^com\\.evernote:android-state$")
+        )
+    }
 }
 
 // keep the changed dependencies for BravePipe more
@@ -454,7 +475,7 @@ project.dependencies.implementation("com.github.evermind-zz.AppUpdater:app-updat
 // the eventbus
 project.dependencies.implementation("org.greenrobot:eventbus:3.3.1")
 // the BravePipeExtractor
-project.dependencies.implementation("com.github.bravepipeproject:extractor:v0.26.3-2.3.6")
+project.dependencies.implementation("com.github.bravepipeproject:extractor:v0.26.5-2.3.7")
 // the LogcatToolkit
 project.dependencies.implementation("com.github.evermind-zz:logcat-toolkit:1.0.0")
 // cf challenge helper
