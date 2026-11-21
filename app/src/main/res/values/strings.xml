@@ -71,6 +71,11 @@
     <string name="notification_action_nothing">Nothing</string>
     <string name="media_session_hide_prev_next_title">Hide prev/next in OS media controls</string>
     <string name="media_session_hide_prev_next_summary">When enabled, the OS media controls (lock screen, quick settings) will show four fully customizable buttons instead of the system-fixed previous and next buttons. Configure all four slots below.</string>
+    <string name="settings_category_prev_next_behavior_title">Prev/next buttons</string>
+    <string name="notification_prev_next_as_seek_title">Make notification prev/next seek</string>
+    <string name="notification_prev_next_as_seek_summary">Prev/next actions in the notification, lock screen, Android Auto and watches rewind/forward instead of changing tracks.</string>
+    <string name="player_prev_next_as_seek_title">Make in-app prev/next seek</string>
+    <string name="player_prev_next_as_seek_summary">Buttons assigned to Previous or Next in the in-app player rewind/forward instead.</string>
     <string name="notification_actions_summary_android13_4slot">All four action buttons around play/pause are customizable. The play/pause button in the center is fixed by the system.</string>
     <string name="notification_action_0_title_4slot">First action button (far left)</string>
     <string name="notification_action_1_title_4slot">Second action button (inner left)</string>
