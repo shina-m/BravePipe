@@ -33,10 +33,11 @@ include("shared")
 // We assume, that NewPipe and NewPipe Extractor have the same parent directory.
 // If this is not the case, please change the path in includeBuild().
 
-// Use the checked out BravePipeExtractor sibling repository (with upstream rebased in)
-// instead of the published extractor artifact when it is available.
-val bravePipeExtractorDir = file("../BravePipeExtractor")
-if (bravePipeExtractorDir.exists()) {
+// Use the checked out BravePipeExtractor repository (the submodule, or a sibling checkout
+// for local development) with upstream rebased in, instead of the published extractor.
+val bravePipeExtractorDir = listOf(file("BravePipeExtractor"), file("../BravePipeExtractor"))
+    .firstOrNull { it.exists() }
+if (bravePipeExtractorDir != null) {
     includeBuild(bravePipeExtractorDir) {
         dependencySubstitution {
             substitute(module("com.github.bravepipeproject:extractor"))
