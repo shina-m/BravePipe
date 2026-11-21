@@ -28,7 +28,7 @@
         app:iconSpaceReserved="false" />
 
     <SwitchPreferenceCompat
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="@string/media_session_hide_prev_next_key"
         android:summary="@string/media_session_hide_prev_next_summary"
         android:title="@string/media_session_hide_prev_next_title"
@@ -41,7 +41,7 @@
         app:iconSpaceReserved="false">
 
         <SwitchPreferenceCompat
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="@string/notification_prev_next_as_seek_key"
             android:summary="@string/notification_prev_next_as_seek_summary"
             android:title="@string/notification_prev_next_as_seek_title"

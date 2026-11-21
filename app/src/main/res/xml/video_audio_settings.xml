@@ -140,7 +140,7 @@
             app:iconSpaceReserved="false" />
 
         <ListPreference
-            android:defaultValue="@string/player_button_action_previous"
+            android:defaultValue="@string/player_button_action_nothing"
             android:entries="@array/player_button_action_description"
             android:entryValues="@array/player_button_action_values"
             android:key="@string/player_button_left_outer_key"
@@ -150,7 +150,7 @@
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            android:defaultValue="@string/player_button_action_rewind"
+            android:defaultValue="@string/player_button_action_nothing"
             android:entries="@array/player_button_action_description"
             android:entryValues="@array/player_button_action_values"
             android:key="@string/player_button_left_inner_key"
@@ -160,7 +160,7 @@
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            android:defaultValue="@string/player_button_action_forward"
+            android:defaultValue="@string/player_button_action_nothing"
             android:entries="@array/player_button_action_description"
             android:entryValues="@array/player_button_action_values"
             android:key="@string/player_button_right_inner_key"
@@ -170,7 +170,7 @@
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            android:defaultValue="@string/player_button_action_next"
+            android:defaultValue="@string/player_button_action_nothing"
             android:entries="@array/player_button_action_description"
             android:entryValues="@array/player_button_action_values"
             android:key="@string/player_button_right_outer_key"
